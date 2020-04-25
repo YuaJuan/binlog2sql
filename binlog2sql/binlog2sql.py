@@ -3,6 +3,7 @@
 
 import sys
 import datetime
+import time
 import pymysql
 from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.event import QueryEvent, RotateEvent, FormatDescriptionEvent
@@ -66,6 +67,7 @@ class Binlog2sql(object):
                                     log_file=self.start_file, log_pos=self.start_pos, only_schemas=self.only_schemas,
                                     only_tables=self.only_tables, resume_stream=True, blocking=True)
 
+        start= time.time()
         flag_last_event = False
         e_start_pos, last_pos = stream.log_pos, stream.log_pos
         # to simplify code, we do not use flock for tmp_file.
@@ -119,6 +121,10 @@ class Binlog2sql(object):
             f_tmp.close()
             if self.flashback:
                 self.print_rollback_sql(filename=tmp_file)
+            end=time.time()
+            yongshi = end - start
+            print("除去打开文件的时候耗时为：%s" % yongshi)
+            
         return True
 
     def print_rollback_sql(self, filename):
