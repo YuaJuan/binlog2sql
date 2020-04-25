@@ -99,16 +99,16 @@ class Binlog2sql(object):
                 if isinstance(binlog_event, QueryEvent) and not self.only_dml:
                     sql = concat_sql_from_binlog_event(cursor=cursor, binlog_event=binlog_event,
                                                        flashback=self.flashback, no_pk=self.no_pk)
-                    if sql:
-                        print(sql)
+                    # if sql:
+                    #     print(sql)
                 elif is_dml_event(binlog_event) and event_type(binlog_event) in self.sql_type:
                     for row in binlog_event.rows:
                         sql = concat_sql_from_binlog_event(cursor=cursor, binlog_event=binlog_event, no_pk=self.no_pk,
                                                            row=row, flashback=self.flashback, e_start_pos=e_start_pos)
                         if self.flashback:
                             f_tmp.write(sql + '\n')
-                        else:
-                            print(sql)
+                        # else:
+                        #     print(sql)
 
                 if not (isinstance(binlog_event, RotateEvent) or isinstance(binlog_event, FormatDescriptionEvent)):
                     last_pos = binlog_event.packet.log_pos
@@ -127,11 +127,11 @@ class Binlog2sql(object):
             batch_size = 1000
             i = 0
             for line in reversed_lines(f_tmp):
-                print(line.rstrip())
+                # print(line.rstrip())
                 if i >= batch_size:
                     i = 0
-                    if self.back_interval:
-                        print('SELECT SLEEP(%s);' % self.back_interval)
+                    # if self.back_interval:
+                    #     print('SELECT SLEEP(%s);' % self.back_interval)
                 else:
                     i += 1
 
@@ -147,4 +147,8 @@ if __name__ == '__main__':
                             stop_time=args.stop_time, only_schemas=args.databases, only_tables=args.tables,
                             no_pk=args.no_pk, flashback=args.flashback, stop_never=args.stop_never,
                             back_interval=args.back_interval, only_dml=args.only_dml, sql_type=args.sql_type)
+    start = time.time()
     binlog2sql.process_binlog()
+    end= time.time()
+    yongshi = end - start
+    print("总耗时为：%s" % yongshi)
